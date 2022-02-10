@@ -1,10 +1,14 @@
-import { retrieveItem, useSkill } from "kolmafia";
+import { retrieveItem, userConfirm, useSkill } from "kolmafia";
 import {
     $class,
     $familiar,
     $item,
+    $monsters,
     $skill,
     ascend,
+    AsdonMartin,
+    CombatLoversLocket,
+    DNALab,
     get,
     have,
     Lifestyle,
@@ -29,8 +33,33 @@ export function main(args = ""): void {
         safariTargets.shift();
     }
 
+    let workshed: "Asdon Martin keyfob" | "Little Geneticist DNA-Splicing Lab" =
+        "Asdon Martin keyfob";
+    if (!AsdonMartin.have() && have($item`Little Geneticist DNA-Splicing Lab`)) {
+        workshed = "Little Geneticist DNA-Splicing Lab";
+    }
+    if (DNALab.installed() && get("_workshedItemUsed")) {
+        workshed = "Little Geneticist DNA-Splicing Lab";
+    }
+    if (args.includes("DNA")) {
+        workshed = "Little Geneticist DNA-Splicing Lab";
+    }
+
+    if (workshed === "Little Geneticist DNA-Splicing Lab") {
+        const requiredLocketMonsters = $monsters`Black Crayon Crimbo Elf, cocktail shrimp`;
+        const locketMonsters = CombatLoversLocket.unlockedLocketMonsters();
+        if (
+            !get("stenchAirportAlways") ||
+            requiredLocketMonsters.some((monster) => !locketMonsters.includes(monster))
+        ) {
+            userConfirm(
+                "Are you sure you want to ascend with DNA? You don't seem to meet all the requirements."
+            );
+        }
+    }
+
     prepareAscension({
-        workshed: "Asdon Martin keyfob",
+        workshed,
         garden: "Peppermint Pip Packet",
         eudora: "Our Daily Candles™ order form",
         chateau: {

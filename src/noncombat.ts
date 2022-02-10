@@ -12,7 +12,17 @@ import {
     visitUrl,
 } from "kolmafia";
 import Macro from "./combat";
-import { $coinmaster, $effect, $familiar, $item, $slot, CommunityService, get, have } from "libram";
+import {
+    $coinmaster,
+    $effect,
+    $familiar,
+    $item,
+    $slot,
+    AsdonMartin,
+    CommunityService,
+    get,
+    have,
+} from "libram";
 import { universalWeightBuffs } from "./familiarweight";
 import { burnLibrams, ensureEffect, fuelUp, heal, horse, setChoice } from "./lib";
 import uniform, { noncombatOutfit } from "./outfits";
@@ -35,7 +45,7 @@ function castBuffs() {
     if (!get("_olympicSwimmingPool")) cliExecute("swim sprints");
 
     while (getFuel() < 37) fuelUp();
-    if (!have($effect`Driving Stealthily`)) cliExecute("asdonmartin drive stealthily");
+    if (!have($effect`Driving Stealthily`)) AsdonMartin.drive(AsdonMartin.Driving.Stealthily);
 
     horse("dark");
 }

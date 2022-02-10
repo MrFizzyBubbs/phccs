@@ -30,11 +30,14 @@ import {
     $items,
     $location,
     $monster,
+    $phylum,
     $skill,
     $skills,
     $slot,
     BeachComb,
+    CombatLoversLocket,
     DaylightShavings,
+    DNALab,
     get,
     have,
     TunnelOfLove,
@@ -179,6 +182,7 @@ function getYoked() {
         $location`The X-32-F Combat Training Snowman`,
         Macro.delevel()
             .tryItem($item`blue rocket`)
+            .tryItem($item`DNA extraction syringe`)
             .defaultKill()
             .repeat(),
         () => {
@@ -186,6 +190,15 @@ function getYoked() {
         },
         () => ensureMp(30)
     );
+
+    if (
+        get("dnaSyringe") === $phylum`construct` &&
+        !have(DNALab.getTonic($phylum`construct`)) &&
+        !have(DNALab.getEffect($phylum`construct`))
+    ) {
+        DNALab.makeTonic(1);
+        use(DNALab.getTonic($phylum`construct`));
+    }
 }
 
 function witchGhostAgent() {
@@ -278,6 +291,21 @@ function lov() {
         use(1, $item`LOV Extraterrestrial Chocolate`);
     }
     burnLibrams();
+}
+
+function goFish() {
+    if (!DNALab.installed() || DNALab.isHybridized()) return;
+
+    if (get("dnaSyringe") !== $phylum`fish`) {
+        uniform($item`Lil' Doctor™ bag`);
+        useDefaultFamiliar(false);
+        Macro.item($item`DNA extraction syringe`)
+            .skill($skill`Chest X-Ray`)
+            .setAutoAttack();
+        CombatLoversLocket.reminisce($monster`cocktail shrimp`);
+    }
+
+    if (get("dnaSyringe") === $phylum`fish`) DNALab.hybridize();
 }
 
 function tomatoJuiceAndNinjaCostume() {
@@ -592,10 +620,60 @@ function restAndBuff(restMax = totalFreeRests()) {
     }
 }
 
+function elfTonic() {
+    if (
+        !DNALab.installed() ||
+        have(DNALab.getTonic($phylum`elf`)) ||
+        have(DNALab.getEffect($phylum`elf`))
+    ) {
+        return;
+    }
+
+    if (get("dnaSyringe") !== $phylum`elf`) {
+        uniform($item`makeshift garbage shirt`);
+        useDefaultFamiliar();
+        Macro.item([$item`Time-Spinner`, $item`DNA extraction syringe`])
+            .defaultKill()
+            .setAutoAttack();
+        CombatLoversLocket.reminisce($monster`Black Crayon Crimbo Elf`);
+    }
+
+    if (get("dnaSyringe") === $phylum`elf`) {
+        DNALab.makeTonic(1);
+    }
+}
+
+function pirateTonic() {
+    if (
+        !DNALab.installed() ||
+        have(DNALab.getTonic($phylum`pirate`)) ||
+        have(DNALab.getEffect($phylum`pirate`))
+    ) {
+        return;
+    }
+
+    if (get("dnaSyringe") !== $phylum`pirate`) {
+        uniform($item`Lil' Doctor™ bag`);
+        useDefaultFamiliar();
+        advMacroAA(
+            $location`Pirates of the Garbage Barges`,
+            Macro.item([$item`Time-Spinner`, $item`DNA extraction syringe`]).skill(
+                $skill`Reflex Hammer`
+            )
+        ),
+            () => get("dnaSyringe") !== $phylum`pirate`;
+    }
+
+    if (get("dnaSyringe") === $phylum`pirate`) {
+        DNALab.makeTonic(1);
+    }
+}
+
 export default function levelUp(): void {
     initialExp();
     buffMyst();
     castBuffs();
+    goFish();
     tomatoJuiceAndNinjaCostume();
     getYoked();
     restAndBuff(11);
@@ -605,7 +683,9 @@ export default function levelUp(): void {
     tentacle();
     godLob();
     restAndBuff();
+    elfTonic();
     mElfLeveling();
     NEP();
     royalty();
+    pirateTonic();
 }

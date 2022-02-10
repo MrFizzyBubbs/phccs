@@ -12,6 +12,7 @@ import {
     runChoice,
     storageAmount,
     takeStorage,
+    use,
     useFamiliar,
     useSkill,
     visitUrl,
@@ -24,9 +25,11 @@ import {
     $item,
     $items,
     $location,
+    $phylum,
     $skill,
     // CommunityService,
     DaylightShavings,
+    DNALab,
     get,
     getSaleValue,
     have,
@@ -92,6 +95,9 @@ function castBuffs() {
     if (availableAmount($item`flask of baconstone juice`) > 0) {
         ensureEffect($effect`Baconstoned`);
     }
+
+    if (have(DNALab.getTonic($phylum`elf`))) use(DNALab.getTonic($phylum`elf`));
+
     if (myClass() === $class`Sauceror` && get("_barrelPrayer")) cliExecute("barrelprayer buff");
 }
 

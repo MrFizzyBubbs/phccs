@@ -21,6 +21,7 @@ import {
     $location,
     $skill,
     $slot,
+    AsdonMartin,
     BeachComb,
     CommunityService,
     get,
@@ -113,8 +114,9 @@ function testPrep() {
     hotresOutfit();
     const improvements = [
         () => {
+            if (!AsdonMartin.installed()) return;
             while (getFuel() < 37) fuelUp();
-            cliExecute("asdonmartin drive safely");
+            AsdonMartin.drive(AsdonMartin.Driving.Safely);
         },
         () => ensureEffect($effect`Amazing`),
     ];

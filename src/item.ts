@@ -3,7 +3,6 @@ import {
     create,
     equip,
     getFuel,
-    getWorkshed,
     myClass,
     numericModifier,
     use,
@@ -16,9 +15,12 @@ import {
     $familiar,
     $item,
     $location,
+    $phylum,
     $skill,
     $slot,
+    AsdonMartin,
     CommunityService,
+    DNALab,
     get,
     have,
 } from "libram";
@@ -47,10 +49,12 @@ function castBuffs() {
     ensureEffect($effect`The Spirit of Taking`);
     ensureEffect($effect`items.enh`);
 
-    if (getWorkshed() === $item`Asdon Martin keyfob` && !have($effect`Driving Observantly`)) {
+    if (AsdonMartin.installed() && !have($effect`Driving Observantly`)) {
         if (getFuel() < 37) fuelUp();
-        cliExecute("asdonmartin drive observantly");
+        AsdonMartin.drive(AsdonMartin.Driving.Observantly);
     }
+
+    if (have(DNALab.getTonic($phylum`pirate`))) use(DNALab.getTonic($phylum`pirate`));
 
     if (!have($effect`I See Everything Thrice!`)) {
         if (!have($item`government`)) {
