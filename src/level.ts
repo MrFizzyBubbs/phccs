@@ -300,6 +300,7 @@ function goFish() {
         uniform($item`Lil' Doctor™ bag`);
         useDefaultFamiliar(false);
         Macro.item($item`DNA extraction syringe`)
+            .skill($skill`Otoscope`)
             .skill($skill`Chest X-Ray`)
             .setAutoAttack();
         CombatLoversLocket.reminisce($monster`cocktail shrimp`);
