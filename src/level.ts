@@ -293,7 +293,7 @@ function lov() {
     burnLibrams();
 }
 
-function goFish() {
+function aShrimpFriedThisRice() {
     if (!DNALab.installed() || DNALab.isHybridized()) return;
 
     if (get("dnaSyringe") !== $phylum`fish`) {
@@ -674,7 +674,7 @@ export default function levelUp(): void {
     initialExp();
     buffMyst();
     castBuffs();
-    goFish();
+    aShrimpFriedThisRice();
     tomatoJuiceAndNinjaCostume();
     getYoked();
     restAndBuff(11);
