@@ -135,6 +135,7 @@ function testPrep() {
     while (have($item`pulled blue taffy`) && !have($effect`Blue Swayed`, 50)) {
         use($item`pulled blue taffy`);
     }
+    if (have($item`shrimp cocktail`)) use($item`shrimp cocktail`);
 }
 
 export default function familiarTest(): void {
