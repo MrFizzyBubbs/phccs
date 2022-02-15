@@ -44,8 +44,10 @@ function castBuffs() {
 
     if (!get("_olympicSwimmingPool")) cliExecute("swim sprints");
 
-    while (getFuel() < 37) fuelUp();
-    if (!have($effect`Driving Stealthily`)) AsdonMartin.drive(AsdonMartin.Driving.Stealthily);
+    if (AsdonMartin.installed()) {
+        while (getFuel() < 37) fuelUp();
+        if (!have($effect`Driving Stealthily`)) AsdonMartin.drive(AsdonMartin.Driving.Stealthily);
+    }
 
     horse("dark");
 }
