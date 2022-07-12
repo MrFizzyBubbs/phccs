@@ -667,7 +667,10 @@ export const chefstaves = $items`Staff of Kitchen Royalty, Staff of the Deepest 
 export function juneCleave(): void {
     if (get("_juneCleaverFightsLeft") > 0) return;
     withOutfit(new Outfit({ weapon: $item`June cleaver` }), () => {
-        adv1($location`Noob Cave`, -1, "");
-        if (get("lastEncounter") === "Poetic Justice") useSkill($skill`Tongue of the Walrus`);
+        try {
+            adv1($location`Noob Cave`, -1, "");
+        } finally {
+            if (get("lastEncounter") === "Poetic Justice") useSkill($skill`Tongue of the Walrus`);
+        }
     });
 }
