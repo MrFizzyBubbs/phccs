@@ -472,7 +472,7 @@ export const maximizeFamiliar = have($familiar`Disembodied Hand`)
     ? $familiar`Disembodied Hand`
     : $familiar`Left-Hand Man`;
 
-function canCastLibrams(): boolean {
+export function canCastLibrams(): boolean {
     const summonNumber = 1 + get("libramSummons");
     const cost = 1 + (summonNumber * (summonNumber - 1)) / 2;
     return myMp() >= cost;
