@@ -1,3 +1,4 @@
+import { Quest, Task } from "grimoire-kolmafia";
 import {
     availableAmount,
     buy,
@@ -24,6 +25,7 @@ import {
 import {
     $class,
     $effect,
+    $effects,
     $familiar,
     $item,
     $items,
@@ -40,7 +42,8 @@ import {
     Witchess,
     withProperties,
 } from "libram";
-import Macro from "./combat";
+import Macro from "../combat";
+import { ensureEffects } from "./common";
 import {
     advMacro,
     advMacroAA,
@@ -57,80 +60,147 @@ import {
     synthExp,
     synthMyst,
     useDefaultFamiliar,
-} from "./lib";
-import uniform from "./outfits";
+} from "../lib";
+import uniform from "../outfits";
 
-function initialExp() {
-    if (!have($effect`That's Just Cloud-Talk, Man`)) {
-        visitUrl("place.php?whichplace=campaway&action=campaway_sky");
-    }
-
-    ensureEffect($effect`Inscrutable Gaze`);
-    ensureEffect($effect`Thaumodynamic`);
-
-    if (!have($effect`Synthesis: Learning`)) synthExp();
-
-    uniform($item`familiar scrapbook`);
-
-    if (availableAmount($item`a ten-percent bonus`)) {
-        use(1, $item`a ten-percent bonus`);
-    }
-    cliExecute("bastille myst brutalist");
-}
-
-function buffMyst() {
-    const lovePotion = $item`Love Potion #0`;
-    const loveEffect = $effect`Tainted Love Potion`;
-    if (!have(loveEffect)) {
-        if (!have(lovePotion)) {
-            useSkill(1, $skill`Love Mixology`);
-        }
-        visitUrl(`desc_effect.php?whicheffect=${loveEffect.descid}`);
-        if (
-            numericModifier(loveEffect, "mysticality") > 10 &&
-            numericModifier(loveEffect, "muscle") > -30 &&
-            numericModifier(loveEffect, "moxie") > -30 &&
-            numericModifier(loveEffect, "maximum hp percent") > -0.001
-        ) {
-            use(1, lovePotion);
-        }
-    }
-
-    if (
-        get("yourFavoriteBirdMods")
-            .split(",")
-            .some((mod) => mod.includes("Mysticality Percent: +"))
-    ) {
-        useSkill($skill`Visit your Favorite Bird`);
-    }
-
-    if (get("spacegateVaccine2") && get("spacegateAlways") && !get("_spacegateVaccine")) {
-        cliExecute("spacegate vaccine 2");
-    }
-
-    ensureEffect($effect`Uncucumbered`);
-    if (!have($effect`Synthesis: Smart`)) synthMyst();
-
-    BeachComb.tryHead($effect`You Learned Something Maybe!`);
-    BeachComb.tryHead($effect`We're All Made of Starfish`);
-
-    if (!get("_lyleFavored")) ensureEffect($effect`Favored by Lyle`);
-    if (!get("telescopeLookedHigh")) ensureEffect($effect`Starry-Eyed`);
-
-    ensureEffect($effect`Glittering Eyelashes`);
-
-    if (!get("_streamsCrossed")) {
-        cliExecute("crossstreams");
-    }
-
-    equip($slot`acc3`, $item`Powerful Glove`);
-    ensureEffect($effect`Triple-Sized`);
-    ensureEffect($effect`Feeling Excited`);
-
-    if (have($item`votive of confidence`)) use($item`votive of confidence`);
-    if (have($item`natural magick candle`)) use($item`natural magick candle`);
-    if (have($item`MayDay™ supply package`)) use($item`MayDay™ supply package`);
-}
+export const levelUpQuest: Quest<Task> = {
+    name: "Level Up",
+    tasks: [
+        {
+            name: "Cloud-Talk",
+            completed: () => have($effect`That's Just Cloud-Talk, Man`),
+            do: () => visitUrl("place.php?whichplace=campaway&action=campaway_sky"),
+            limit: { tries: 1 },
+        },
+        {
+            name: "Synth Exp",
+            completed: () => have($effect`Synthesis: Learning`),
+            do: () => synthExp(),
+            effects: $effects`Inscrutable Gaze, Thaumodynamic`,
+            limit: { tries: 1 },
+        },
+        {
+            name: "Ten-Percent Bonus",
+            completed: () => !have($item`a ten-percent bonus`),
+            do: () => use($item`a ten-percent bonus`),
+            outfit: { equip: $items`familiar scrapbook` },
+            limit: { tries: 1 },
+        },
+        {
+            name: "Bastille",
+            completed: () => get("_bastilleGames") > 0,
+            do: () => cliExecute("bastille myst brutalist"),
+            outfit: { equip: $items`familiar scrapbook` },
+            limit: { tries: 1 },
+        },
+        // const lovePotion = $item`Love Potion #0`;
+        // const loveEffect = $effect`Tainted Love Potion`;
+        // if (!have(loveEffect)) {
+        //     if (!have(lovePotion)) {
+        //         useSkill(1, $skill`Love Mixology`);
+        //     }
+        //     visitUrl(`desc_effect.php?whicheffect=${loveEffect.descid}`);
+        //     if (
+        //         numericModifier(loveEffect, "mysticality") > 10 &&
+        //         numericModifier(loveEffect, "muscle") > -30 &&
+        //         numericModifier(loveEffect, "moxie") > -30 &&
+        //         numericModifier(loveEffect, "maximum hp percent") > -0.001
+        //     ) {
+        //         use(1, lovePotion);
+        //     }
+        // }
+        {
+            name: "Love Potion",
+            completed: () => false,
+            do: () => null,
+            acquire:
+        },
+        {
+            name: "Favorite Bird",
+            completed: () =>
+                !get("yourFavoriteBirdMods")
+                    .split(",")
+                    .some((mod) => mod.includes("Mysticality Percent: +")) ||
+                get("_favoriteBirdVisited"),
+            do: () => useSkill($skill`Visit your Favorite Bird`),
+        },
+        {
+            name: "Vaccine",
+            completed: () =>
+                !get("spacegateVaccine2") || !get("spacegateAlways") || get("_spacegateVaccine"),
+            do: () => cliExecute("spacegate vaccine 2"),
+        },
+        {
+            name: "Synth Myst",
+            completed: () => have($effect`Synthesis: Smart`),
+            do: () => synthMyst(),
+            effects: $effects`Uncucumbered`,
+            limit: { tries: 1 },
+        },
+        {
+            name: "Beach Heads",
+            completed: () =>
+                !have($item`Beach Comb`) ||
+                (get("_beachHeadsUsed").includes("7") && get("_beachHeadsUsed").includes("11")),
+            do: (): void => {
+                BeachComb.tryHead($effect`You Learned Something Maybe!`);
+                BeachComb.tryHead($effect`We're All Made of Starfish`);
+            },
+            limit: { tries: 1 },
+        },
+        {
+            name: "Lyle",
+            completed: () => get("_lyleFavored"),
+            do: () => ensureEffect($effect`Favored by Lyle`),
+            limit: { tries: 1 },
+        },
+        {
+            name: "Telescope",
+            completed: () => get("telescopeLookedHigh"),
+            do: () => ensureEffect($effect`Starry-Eyed`),
+            limit: { tries: 1 },
+        },
+        {
+            name: "Streams",
+            completed: () => get("_streamsCrossed"),
+            do: () => cliExecute("crossstreams"),
+            effects: $effects`Glittering Eyelashes`,
+            limit: { tries: 1 },
+        },
+        {
+            name: "",
+            completed: () => false,
+            prepare: () => equip($slot`acc3`, $item`Powerful Glove`),
+            do: () => ensureEffect($effect`Triple-Sized`),
+            effects: $effects`Feeling Excited`,
+            limit: { tries: 1 },
+        },
+        {
+            name: "Usables",
+            completed: () =>
+                [
+                    $item`votive of confidence`,
+                    $item`natural magick candle`,
+                    $item`MayDay™ supply package`,
+                ].every((item) => !have(item)),
+            do: () =>
+                [
+                    $item`votive of confidence`,
+                    $item`natural magick candle`,
+                    $item`MayDay™ supply package`,
+                ].forEach((item) => {
+                    if (have(item)) use(item);
+                }),
+            limit: { tries: 1 },
+        },
+        {
+            name: "",
+            completed: () => false,
+            do: () => null,
+            limit: { tries: 1 },
+        },
+    ],
+};
 
 function castBuffs() {
     uniform($item`Abracandalabra`);

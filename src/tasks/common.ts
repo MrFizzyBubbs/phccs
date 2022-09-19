@@ -1,6 +1,6 @@
 import { Task } from "grimoire-kolmafia";
-import { useSkill } from "kolmafia";
-import { $effect, $item, $location, $skill, get, have } from "libram";
+import { Effect, useSkill } from "kolmafia";
+import { $effect, $item, $location, $skill, ensureEffect, get, have } from "libram";
 import { canCastLibrams } from "../lib";
 
 export function juneCleave(): Task {
@@ -21,5 +21,15 @@ export function burnLibrams(): Task {
         name: "Burn Librams",
         completed: () => !canCastLibrams(),
         do: () => burnLibrams(),
+        limit: { tries: 1 },
+    };
+}
+
+export function ensureEffects(effects: Effect[]): Task {
+    return {
+        name: "Buffs",
+        completed: () => effects.every((ef) => have(ef)),
+        do: () => effects.forEach((ef) => ensureEffect(ef)),
+        limit: { tries: 1 },
     };
 }
